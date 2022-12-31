@@ -1,30 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ponudniki-deployment
+  name: analitika-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ponudniki
+      app: analitika
   template:
     metadata:
       labels:
-        app: ponudniki
+        app: analitika
     spec:
       containers:
-        - image: rso2223s01/ponudniki:latest
-          name: ponudniki
-          env:
-            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
-              value: jdbc:postgresql://raja.db.elephantsql.com:5432/nglexaye
-            - name: KUMULUZEE_DATASOURCES0_USERNAME
-              value: nglexaye
-            - name: KUMULUZEE_DATASOURCES0_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: pg-ponudniki-pass
-                  key: KUMULUZEE_DATASOURCES0_PASSWORD
+        - image: rso2223s01/analitika:latest
+          name: analitika
           ports:
             - containerPort: 8080
               name: server
@@ -47,7 +37,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ponudniki
+  name: analitika
 spec:
   type: LoadBalancer
   ports:
@@ -55,4 +45,4 @@ spec:
       protocol: TCP
       targetPort: server
   selector:
-    app: ponudniki
+    app: analitika

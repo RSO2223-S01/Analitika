@@ -13,7 +13,6 @@
     <modules>
         <module>api</module>
         <module>services</module>
-        <module>lib</module>
     </modules>
 
     <properties>
@@ -91,11 +90,6 @@
             <dependency>
                 <groupId>si.fri.rso.skupina1</groupId>
                 <artifactId>analitika-services</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>si.fri.rso.skupina1</groupId>
-                <artifactId>analitika-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

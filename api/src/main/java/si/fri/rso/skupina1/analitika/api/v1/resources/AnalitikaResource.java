@@ -1,8 +1,14 @@
 package si.fri.rso.skupina1.analitika.api.v1.resources;
 
-
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.logs.cdi.Log;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.annotation.PostConstruct;
@@ -12,7 +18,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -50,128 +55,156 @@ public class AnalitikaResource {
                 .readEntity(String.class);
     }
 
-
+    @Operation(description = "Pridobi število naročil uporabnika", summary = "Pridobi število naročil uporabnika")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    description = "Integer",
+                    content = @Content(
+                            schema = @Schema(implementation = Integer.class))
+            )})
     @GET
-    public String getSteviloNarocil() throws WebApplicationException, ProcessingException {
+    @Path("/{uporabnikId}/orders")
+    public Integer getSteviloNarocil(@Parameter(description = "Uporabnik ID.", required = true)
+                                     @PathParam("uporabnikId") Integer uporabnikId) throws WebApplicationException, ProcessingException {
 
-        String graphQLquery = "query MyQuery {\n" +
-                "  allPonudniki {\n" +
-                "    result {\n" +
-                "      ime\n" +
-                "      mesto\n" +
-                "      ponudnikId\n" +
-                "      postnaSt\n" +
-                "      ulica\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
+        String graphQLquery = """
+                query MyQuery {
+                  allOrders(filter: {fields: {field: "clientId", op: EQ, value: "%d"}}) {
+                    result {
+                      id
+                    }
+                  }
+                }
+                """.formatted(uporabnikId);
         String res = executePOST(graphQLquery);
-        JSONObject jsonObject = new JSONObject(res);
-        return res;
+
+        return new JSONObject(res)
+                .getJSONObject("data")
+                .getJSONObject("allOrders")
+                .getJSONArray("result")
+                .length();
     }
 
-    
-//    @Operation(description = "Pridobi podatke o ponudniku", summary = "Pridobi podatke o ponudniku")
-//    @APIResponses({
-//            @APIResponse(responseCode = "200",
-//                    description = "Ponudnik",
-//                    content = @Content(
-//                            schema = @Schema(implementation = Ponudnik.class))
-//            )})
-//    @GET
-//    @Path("/{ponudnikId}")
-//    public Response getPonudnik(@Parameter(description = "Podnudnik ID.", required = true)
-//                                     @PathParam("ponudnikId") Integer ponudnikId) {
-//
-//        Ponudnik ponudnik = ponudnikBean.getPonudnik(ponudnikId);
-//
-//        if (ponudnik == null) {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//
-//        return Response.status(Response.Status.OK).entity(ponudnik).build();
-//    }
-//
-//
-//
-//    @Operation(description = "Dodaj ponudnika.", summary = "Dodaj ponudnika")
-//    @APIResponses({
-//            @APIResponse(responseCode = "201",
-//                    description = "Ponudnik successfuly added."
-//            ),
-//            @APIResponse(responseCode = "405", description = "Validation error.")
-//    })
-//    @POST
-//    public Response createPonudnik(@RequestBody(
-//            description = "DTO objekt s ponudnikom.",
-//            required = true, content = @Content(
-//            schema = @Schema(implementation = Ponudnik.class))) Ponudnik ponudnik) {
-//
-//        if ((ponudnik.getIme() == null || ponudnik.getMesto() == null || ponudnik.getPostnaSt() == null) || ponudnik.getUlica() == null) {
-//            return Response.status(Response.Status.BAD_REQUEST).build();
-//        }
-//        else {
-//            ponudnik = ponudnikBean.createPonudnik(ponudnik);
-//        }
-//
-//        return Response.status(Response.Status.CONFLICT).entity(ponudnik).build();
-//
-//    }
-//
-//
-//    @Operation(description = "Posodobi ponudnika.", summary = "Posodobi ponudnika")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "200",
-//                    description = "Ponudnik successfully updated."
-//            )
-//    })
-//    @PUT
-//    @Path("{ponudnikId}")
-//    public Response putPonudnik(@Parameter(description = "Ponudnik ID.", required = true)
-//                                     @PathParam("ponudnikId") Integer ponudnikId,
-//                                     @RequestBody(
-//                                             description = "DTO objekt s ponudnikom",
-//                                             required = true, content = @Content(
-//                                             schema = @Schema(implementation = Ponudnik.class)))
-//                                             Ponudnik ponudnik){
-//
-//        ponudnik = ponudnikBean.putPonudnik(ponudnikId, ponudnik);
-//
-//        if (ponudnik == null) {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//
-//        return Response.status(Response.Status.NOT_MODIFIED).build();
-//
-//    }
-//
-//    @Operation(description = "Izbriši ponudnika.", summary = "Izbriši ponudnika")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "200",
-//                    description = "Ponudnik successfully deleted."
-//            ),
-//            @APIResponse(
-//                    responseCode = "404",
-//                    description = "Not found."
-//            )
-//    })
-//    @DELETE
-//    @Path("{ponudnikId}")
-//    public Response deletePonudnik(@Parameter(description = "Ponudnik ID.", required = true)
-//                                        @PathParam("ponudnikId") Integer ponudnikId){
-//
-//        boolean deleted = ponudnikBean.deletePonudnik(ponudnikId);
-//
-//        if (deleted) {
-//            return Response.status(Response.Status.NO_CONTENT).build();
-//        }
-//        else {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//    }
 
 
+    @Operation(description = "Pridobi število dostav uporabnika", summary = "Pridobi število dostav uporabnika")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    description = "Integer",
+                    content = @Content(
+                            schema = @Schema(implementation = Integer.class))
+            )})
+    @GET
+    @Path("/{uporabnikId}/deliveries")
+    public Integer getSteviloDostav(@Parameter(description = "Uporabnik ID.", required = true)
+                                     @PathParam("uporabnikId") Integer uporabnikId) throws WebApplicationException, ProcessingException {
+
+        String graphQLquery = """
+                query MyQuery {
+                  allOrders(filter: {fields: {field: "deliveryPersonId", op: EQ, value: "%d"}}) {
+                    result {
+                      id
+                    }
+                  }
+                }
+                """.formatted(uporabnikId);
+        String res = executePOST(graphQLquery);
+
+        return new JSONObject(res)
+                .getJSONObject("data")
+                .getJSONObject("allOrders")
+                .getJSONArray("result")
+                .length();
+    }
+
+
+    @Operation(description = "Pridobi skupne stroške uporabnika", summary = "Pridobi skupne stroške uporabnika")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    description = "Double",
+                    content = @Content(
+                            schema = @Schema(implementation = Double.class))
+            )})
+    @GET
+    @Path("/{uporabnikId}/costs")
+    public Double getSkupniStrosek(@Parameter(description = "Uporabnik ID.", required = true)
+                                    @PathParam("uporabnikId") Integer uporabnikId) throws WebApplicationException, ProcessingException {
+
+        String graphQLquery = """
+                query MyQuery {
+                  allOrders(filter: {fields: {field: "clientId", op: EQ, value: "%d"}}) {
+                    result {
+                      items {
+                        price
+                      }
+                    }
+                  }
+                }
+                """.formatted(uporabnikId);
+        String res = executePOST(graphQLquery);
+
+        Double costSum = 0.0;
+        JSONArray arr = new JSONObject(res)
+                .getJSONObject("data")
+                .getJSONObject("allOrders")
+                .getJSONArray("result");
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONArray items = arr.getJSONObject(i)
+                            .getJSONArray("items");
+            for (int j = 0; j < items.length(); j++) {
+                costSum = Double.sum(
+                        costSum,
+                        items.getJSONObject(j).getDouble("price")
+                );
+            }
+        }
+        return costSum;
+    }
+
+
+
+    @Operation(description = "Pridobi skupni zaslužek ponudnika", summary = "Pridobi skupni zaslužek ponudnika")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    description = "Double",
+                    content = @Content(
+                            schema = @Schema(implementation = Double.class))
+            )})
+    @GET
+    @Path("/{ponudnikId}/earnings")
+    public Double getSkupniZasluzek(@Parameter(description = "Ponudnik ID.", required = true)
+                                   @PathParam("ponudnikId") Integer ponudnikId) throws WebApplicationException, ProcessingException {
+
+        String graphQLquery = """
+                query MyQuery {
+                  allOrders(filter: {fields: {field: "providerId", op: EQ, value: "%d"}}) {
+                    result {
+                      items {
+                        price
+                      }
+                    }
+                  }
+                }
+                """.formatted(ponudnikId);
+        String res = executePOST(graphQLquery);
+
+        Double costSum = 0.0;
+        JSONArray arr = new JSONObject(res)
+                .getJSONObject("data")
+                .getJSONObject("allOrders")
+                .getJSONArray("result");
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONArray items = arr.getJSONObject(i)
+                    .getJSONArray("items");
+            for (int j = 0; j < items.length(); j++) {
+                costSum = Double.sum(
+                        costSum,
+                        items.getJSONObject(j).getDouble("price")
+                );
+            }
+        }
+        return costSum;
+    }
 }

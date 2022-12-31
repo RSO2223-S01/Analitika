@@ -31,11 +31,6 @@ kumuluzee:
       http-health-check:
         - connection-url: http://localhost:8081/openapi
           type: readiness
-        - connection-url: http://localhost:8081/v1/analytics
-          type: readiness
-      disk-space-health-check:
-        threshold: 100
-        type: both
   logs:
     config-file: '<?xml version="1.0" encoding="UTF-8"?>
                             <Configuration name="comments">

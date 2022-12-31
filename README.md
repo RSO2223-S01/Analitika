@@ -53,8 +53,8 @@ Value: true or false
 kubectl version
 kubectl --help
 kubectl get nodes
-kubectl create -f ponudniki-deployment.yaml 
-kubectl apply -f ponudniki-deployment.yaml 
+kubectl create -f analitika-deployment.yaml 
+kubectl apply -f analitika-deployment.yaml 
 kubectl get services 
 kubectl get deployments
 kubectl get pods
