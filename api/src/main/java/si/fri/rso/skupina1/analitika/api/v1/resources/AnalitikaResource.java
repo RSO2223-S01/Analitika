@@ -77,7 +77,7 @@ public class AnalitikaResource {
                 }
                 """.formatted(uporabnikId);
         String res = executePOST(graphQLquery);
-
+		log.info(res);
         return new JSONObject(res)
                 .getJSONObject("data")
                 .getJSONObject("allOrders")
