@@ -55,7 +55,7 @@ rest-properties:
   maintenance-mode: false
   broken: false
 integrations:
-  ponudniki:
-    baseurl: "http://ponudniki:8080/graphql"
+  narocila:
+    baseurl: "http://narocila:8080/graphql"
 
 

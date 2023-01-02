@@ -41,7 +41,7 @@ public class AnalitikaResource {
     @PostConstruct
     private void init() {
         httpClient = ClientBuilder.newClient();
-        baseUrl = ConfigurationUtil.getInstance().get("integrations.ponudniki.baseurl").get();
+        baseUrl = ConfigurationUtil.getInstance().get("integrations.narocila.baseurl").get();
         log.info("Initialized: " + AnalitikaResource.class.getName() + ", UUID: " + uuid);
     }
 
