@@ -15,6 +15,11 @@ spec:
       containers:
         - image: rso2223s01/analitika:latest
           name: analitika
+          env:
+            - name: KUMULUZEE_CONFIG_CONSUL_AGENT
+              value: http://consul:8500
+            - name: INTEGRATIONS_PONUDNIKI_BASEURL
+              value: http://ponudniki:8080/graphql
           ports:
             - containerPort: 8080
               name: server

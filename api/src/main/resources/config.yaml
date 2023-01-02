@@ -4,9 +4,9 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8081
+    base-url: http://localhost:8080
     http:
-      port: 8081
+      port: 8080
   openapi-mp:
     enabled: true
     servlet:
@@ -29,7 +29,7 @@ kumuluzee:
       period-s: 30
     checks:
       http-health-check:
-        - connection-url: http://localhost:8081/openapi
+        - connection-url: http://localhost:8080/openapi
           type: readiness
   logs:
     config-file: '<?xml version="1.0" encoding="UTF-8"?>
