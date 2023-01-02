@@ -16,23 +16,27 @@ spec:
         - image: rso2223s01/analitika:latest
           name: analitika
           env:
+            - name: KUMULUZEE_SERVER_CONTEXTPATH
+              value: /analytics
+            - name: KUMULUZEE_HEALTH_CHECKS_HTTPHEALTHCHECK0_CONNECTIONURL
+              value: http://localhost:8080/analytics/openapi
             - name: KUMULUZEE_CONFIG_CONSUL_AGENT
               value: http://consul:8500
-            - name: INTEGRATIONS_PONUDNIKI_BASEURL
-              value: http://ponudniki:8080/graphql
+            - name: INTEGRATIONS_NAROCILA_BASEURL
+              value: http://narocila:8080/orders/graphql
           ports:
             - containerPort: 8080
               name: server
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health/live
+              path: /analytics/health/live
               port: server
             initialDelaySeconds: 20
             periodSeconds: 3
           readinessProbe:
             httpGet:
-              path: /health/ready
+              path: /analytics/health/ready
               port: server
             initialDelaySeconds: 20
             periodSeconds: 3
